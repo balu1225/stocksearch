@@ -1,0 +1,82 @@
+body {
+    background-color: rgb(107, 106, 154);
+    margin: 0; /* Remove default body margin */
+    padding: 0; /* Remove default body padding */
+}
+
+.container {
+    width: 60%;
+    max-width: 800px;
+    margin: 100px auto; /* Center the container horizontally */
+    justify-content: center; /* This property applies to flex containers */
+    align-items: center; /* This property applies to flex containers */
+   
+}
+.stocksearch-container, .subnavbar, .companydetails,.stocksummary{
+    background-color: white;
+    background: linear-gradient(to right, #d3ecf6, #f5c9f0);
+    padding: 20px;
+    border-radius: 5px;
+}
+
+.container div{
+    text-align: center;
+    align-items: center;
+    margin-bottom: 10px;
+    
+}
+.buttons button{
+    background-color: white;
+    border: 0;
+    margin: 20px;
+    padding:5px 15px;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.buttons .submit:hover{
+    background-color: rgba(6, 160, 6, 0.995);
+}
+.buttons .clear:hover{
+    background-color: rgba(239, 5, 44, 0.995);
+}
+.divider-line{ 
+    border: 1px solid rgb(255, 253, 253) ;
+}
+
+.subnavbar{
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.subnavbar a {
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+    text-align: center; /* Center align text */
+    padding: 25px 20px; /* Adjust padding as needed */
+   
+}
+
+.subnavbar a:hover{
+    background-color: #447b91;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    text-align: left;
+}
+th, td {
+    border-bottom: 0.5px solid #3f3f3f;
+    padding: 8px;
+    
+    
+}
+th {
+    background-color: #447b91;
+    width: 30%;
+
+}
+.companydetails,.stocksummary{
+    padding: 0px;
+}
