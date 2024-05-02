@@ -26,80 +26,107 @@ function handleFormSubmit(event) {
 // Function to handle click on "Company Outlook" link
 function handleCompanyOutlookClick(event) {
     event.preventDefault();
-    document.querySelector('.companydetails').innerHTML = `
-        <table>
-            <tr>
-                <th>Company Name</th>
-                <td id="companyName">Loading...</td>
-            </tr>
-            <tr>
-                <th>Stock Ticker Symbol</th>
-                <td id="tickerSymbol">Loading...</td>
-            </tr>
-            <tr>
-                <th>Stock Exchange Code</th>
-                <td id="exchangeCode">Loading...</td>
-            </tr>
-            <tr>
-                <th>Company Start Date</th>
-                <td id="startDate">Loading...</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td id="description">Loading...</td>
-            </tr>
-        </table>
-    `;
+    const ticker = stockInput.value; // Get ticker from input field
+    fetch(`/api/tiingo/${ticker}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.querySelector('.companydetails').innerHTML = `
+                <table>
+                    <tr>
+                        <th>Company Name</th>
+                        <td id="companyName">${data.name || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <th>Stock Ticker Symbol</th>
+                        <td id="tickerSymbol">${data.ticker || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <th>Stock Exchange Code</th>
+                        <td id="exchangeCode">${data.exchangeCode || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <th>Company Start Date</th>
+                        <td id="startDate">${data.startDate || 'N/A'}</td>
+                    </tr>
+                    <tr>
+                        <th>Description</th>
+                        <td id="description">${data.description || 'N/A'}</td>
+                    </tr>
+                </table>
+            `;
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
 }
 
 // Function to handle click on "Stock Summary" link
 function handleStockSummaryClick(event) {
     event.preventDefault();
-    document.querySelector('.companydetails').innerHTML = `
-        <table>
-            <tr>
-                <th>Stock Ticker Symbol</th>
-                <td id="tickerSymbol">Loading...</td>
-            </tr>
-            <tr>
-                <th>Trading Day</th>
-                <td id="tradingDay">Loading...</td>
-            </tr>
-            <tr>
-                <th>Previous Closing Price</th>
-                <td id="prevClose">Loading...</td>
-            </tr>
-            <tr>
-                <th>Opening Price</th>
-                <td id="open">Loading...</td>
-            </tr>
-            <tr>
-                <th>High Price</th>
-                <td id="high">Loading...</td>
-            </tr>
-            <tr>
-                <th>Low Price</th>
-                <td id="low">Loading...</td>
-            </tr>
-            <tr>
-                <th>Last Price</th>
-                <td id="last">Loading...</td>
-            </tr>
-            <tr>
-                <th>Change</th>
-                <td id="change">Loading...</td>
-            </tr>
-            <tr>
-                <th>Change Percent</th>
-                <td id="changePercent">Loading...</td>
-            </tr>
-            <tr>
-                <th>Number of Shares Traded</th>
-                <td id="volume">Loading...</td>
-            </tr>
-        </table>
-    `;
+    const ticker = stockInput.value; // Assuming you want to use the ticker entered by the user
+
+    fetch(`/api/iex/${ticker}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Ensure data is not empty and we have at least one object in the array
+            if (data && data.length > 0) {
+                const stock = data[0];
+                document.querySelector('.companydetails').innerHTML = `
+                    <table>
+                        <tr>
+                            <th>Stock Ticker Symbol</th>
+                            <td id="tickerSymbol">${stock.ticker || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Trading Day</th>
+                            <td id="tradingDay">${new Date(stock.timestamp).toLocaleDateString() || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Previous Closing Price</th>
+                            <td id="prevClose">${stock.prevClose || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Opening Price</th>
+                            <td id="open">${stock.open || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>High Price</th>
+                            <td id="high">${stock.high || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Low Price</th>
+                            <td id="low">${stock.low || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Last Price</th>
+                            <td id="last">${stock.last || 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Volume</th>
+                            <td id="volume">${stock.volume || 'N/A'}</td>
+                        </tr>
+                    </table>
+                `;
+            } else {
+                document.querySelector('.companydetails').innerHTML = '<p>No data available for this ticker.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            document.querySelector('.companydetails').innerHTML = `<p>Error loading stock data. Please try again later.</p>`;
+        });
 }
+
 
 // Event listener for "Stock Summary" link
 
