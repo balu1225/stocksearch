@@ -21,6 +21,7 @@ function handleFormSubmit(event) {
         <div class="chartcontainer" id="chartContainer"></div>
     `;
     // You can fetch data or perform other actions here if needed
+    handleCompanyOutlookClick(event);
 }
 
 // Function to handle click on "Company Outlook" link
@@ -130,6 +131,21 @@ function handleStockSummaryClick(event) {
 
 // Event listener for "Stock Summary" link
 
+function handleChartsClick(event) {
+    event.preventDefault();
+    
+    document.querySelector('.companydetails').innerHTML = `
+        <h1>display charts</h1>
+    `;
+}
+
+function handleNewsClick(event) {
+    event.preventDefault();
+    document.querySelector('.companydetails').innerHTML = `
+        <h1>display news</h1>
+        
+    `;
+}
 
 
 // Function to clear the input field
@@ -154,5 +170,14 @@ document.addEventListener('DOMContentLoaded', function() {
             handleStockSummaryClick(event);
         }
     });
-   
+    document.addEventListener('click', function(event) {
+        if (event.target.id === 'charts') {
+            handleChartsClick(event);
+        }
+    });
+    document.addEventListener('click', function(event) {
+        if (event.target.id === 'latestNews') {
+            handleNewsClick(event);
+        }
+    });
 });
