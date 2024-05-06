@@ -56,7 +56,7 @@ def get_iex_data(ticker):
 def get_prices_data(ticker):
     startDate = request.args.get('startDate', '2019-01-02')
     resampleFreq = request.args.get('resampleFreq', '5min')
-    columns = request.args.get('columns', 'open,high,low,close,volume')
+    columns = request.args.get('columns', 'close')
     
     params = {
         'startDate': startDate,

@@ -17,8 +17,7 @@ function handleFormSubmit(event) {
         </div>
         
         <div class="companydetails" id="companyDetails"></div>
-        <div class="stocksummary" id="stockSummary"></div>
-        <div class="chartcontainer" id="chartContainer"></div>
+    
     `;
     // You can fetch data or perform other actions here if needed
     handleCompanyOutlookClick(event);
@@ -82,6 +81,7 @@ function handleStockSummaryClick(event) {
             // Ensure data is not empty and we have at least one object in the array
             if (data && data.length > 0) {
                 const stock = data[0];
+                console.log((stock.last-stock.prevClose).toFixed(2));
                 document.querySelector('.companydetails').innerHTML = `
                     <table>
                         <tr>
@@ -113,6 +113,14 @@ function handleStockSummaryClick(event) {
                             <td id="last">${stock.last || 'N/A'}</td>
                         </tr>
                         <tr>
+                            <th>Change</th>
+                            <td id="change">${(stock.last-stock.prevClose).toFixed(2)|| 'N/A'}</td>
+                        </tr>
+                        <tr>
+                            <th>Change Percent</th>
+                            <td id="changePercent">${(stock.last/stock.prevClose).toFixed(2)|| 'N/A'}</td>
+                        </tr>
+                        <tr>
                             <th>Volume</th>
                             <td id="volume">${stock.volume || 'N/A'}</td>
                         </tr>
@@ -131,13 +139,85 @@ function handleStockSummaryClick(event) {
 
 // Event listener for "Stock Summary" link
 
+// Function to handle click on "Charts" link
 function handleChartsClick(event) {
     event.preventDefault();
-    
-    document.querySelector('.companydetails').innerHTML = `
-        <h1>display charts</h1>
-    `;
+    const ticker = stockInput.value; // Get ticker from input field
+
+    fetch(`/api/prices/${ticker}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Extracting the date and close price from the response data
+            const seriesData = data.map(entry => [Date.parse(entry.date), entry.close]);
+
+            // Create the chart
+            document.querySelector('.companydetails').innerHTML = `
+                <div id="containerr" style="height: 400px; max-width: 800px"></div>
+            `;
+            Highcharts.stockChart('containerr', {
+                rangeSelector: {
+                    buttons: [{
+                        type: 'day',
+                        count: 7,
+                        text: '7d'
+                    }, {
+                        type: 'day',
+                        count: 15,
+                        text: '15d'
+                    }, {
+                        type: 'month',
+                        count: 1,
+                        text: '1m'
+                    }, {
+                        type: 'month',
+                        count: 3,
+                        text: '3m'
+                    }, {
+                        type: 'month',
+                        count: 6,
+                        text: '6m'
+                    }],
+                    selected: 2 // Index of the default button (1 month)
+                },
+
+                title: {
+                    text: `${ticker} Stock Prices`
+                },
+
+                series: [{
+                    name: `${ticker} Stock Price`,
+                    data: seriesData,
+                    type: 'areaspline',
+                    threshold: null,
+                    tooltip: {
+                        valueDecimals: 2
+                    },
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    }
+                }]
+            });
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            document.querySelector('.companydetails').innerHTML = `<p>Error loading stock data. Please try again later.</p>`;
+        });
 }
+
 
 function handleNewsClick(event) {
     event.preventDefault();
