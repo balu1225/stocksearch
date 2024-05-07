@@ -82,3 +82,37 @@ th {
     padding: 0px;
 }
 
+.newscontainer{
+    display: flex;
+    height: 125px;
+    max-width: 800px;
+    padding: 5px 10px;
+    background: linear-gradient(to right, #d3ecf6, #f5c9f0);
+    border-radius: 5px;
+}
+.image-container img{
+    height: 100px;
+    width: 100px;
+    margin-bottom: 0;
+    padding: 0px 5px;
+}
+
+.content_container p, a ,.image-container{
+    margin: 0px;
+    padding: 0px 5px;
+     
+}
+
+.content_container{
+    height: 100px;
+    width: 760px;
+    margin-bottom: 0px;
+    text-align: left;
+    font-size: 12px;
+    padding: 0px 5px;
+}
+
+.newscontainer div{
+    margin: 0px;
+    text-align: left;
+}

@@ -154,10 +154,10 @@ function handleChartsClick(event) {
         .then(data => {
             // Extracting the date and close price from the response data
             const seriesData = data.map(entry => [Date.parse(entry.date), entry.close]);
-
+            console.log(seriesData);
             // Create the chart
             document.querySelector('.companydetails').innerHTML = `
-                <div id="containerr" style="height: 400px; max-width: 800px"></div>
+                <div id="containerr" style="height: 400px; max-width: 800px; background: white;"></div>
             `;
             Highcharts.stockChart('containerr', {
                 rangeSelector: {
@@ -188,7 +188,10 @@ function handleChartsClick(event) {
                 title: {
                     text: `${ticker} Stock Prices`
                 },
-
+                subtitle: {
+                    text: '<a href="https://www.tiingo.com/" target="_blank">source link</a>',
+                    useHTML: true
+                },
                 series: [{
                     name: `${ticker} Stock Price`,
                     data: seriesData,
@@ -219,13 +222,57 @@ function handleChartsClick(event) {
 }
 
 
+// Function to handle click on "Latest News" link
 function handleNewsClick(event) {
     event.preventDefault();
-    document.querySelector('.companydetails').innerHTML = `
-        <h1>display news</h1>
-        
-    `;
+
+    // Fetch news data from the backend
+    fetch(`/api/news/${stockInput.value}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Generate HTML for news articles
+            let newsHTML = '';
+            data.forEach(article => {
+                
+                newsHTML += `
+                    <div class="newscontainer">
+                        <div class="image-container">
+                            <img src="${article.image}" alt="News Image">
+                        </div>
+                        <div class="content_container">
+                            <p>${article.title}</p>
+                            <p>Published Date: ${article.date}</p>
+                            <a href="${article.link}" target="_blank">Source to the news</a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Display the news articles in the companydetails container
+            const companyDetails = document.querySelector('.companydetails');
+            companyDetails.innerHTML = `
+                <div class="news-container">
+                    ${newsHTML}
+                </div>
+            `;
+
+            // Apply styles to enable overflow scrolling for the container
+            const newsContainer = companyDetails.querySelector('.news-container');
+            newsContainer.style.maxHeight = '400px'; // Set maximum height
+            newsContainer.style.overflowY = 'auto'; // Enable vertical scrollbar
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+            document.querySelector('.companydetails').innerHTML = `<p>Error loading news data. Please try again later.</p>`;
+        });
 }
+
+
 
 
 // Function to clear the input field

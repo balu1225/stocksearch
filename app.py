@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 import requests
 import logging
-
+from datetime import datetime
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 
@@ -72,6 +72,47 @@ def get_prices_data(ticker):
         logging.error(f"Failed to fetch historical price data for ticker {ticker}: {response.text}")
         return jsonify({'error': 'Failed to fetch historical price data',
                         'status_code': response.status_code,
+                        'message': response.text}), 500
+
+
+def format_date(date_string):
+    # Parse the date string and format it
+    try:
+        date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
+        formatted_date = date_object.strftime('%B %d, %Y')
+    except ValueError:
+        formatted_date = date_string  # Return the original string if parsing fails
+    return formatted_date
+
+# Route to fetch news articles related to a specific ticker from News API
+@app.route('/api/news/<ticker>', methods=['GET'])
+def get_news_data(ticker):
+    NEWS_API_URL = 'https://newsapi.org/v2/everything'
+    NEWS_API_KEY = '0482bfd9125543169f5589e19e0d6de8'
+    
+    params = {
+        'q': ticker,
+        'apiKey': NEWS_API_KEY
+    }
+    response = requests.get(NEWS_API_URL, params=params)
+    
+    if response.status_code == 200:
+        news_data = response.json()['articles']
+        formatted_news = []
+        for article in news_data:
+            formatted_article = {
+                'title': article['title'],
+                'date': format_date(article['publishedAt']),  # Format the date
+                'image': article['urlToImage'],
+                'link': article['url']
+            }
+            formatted_news.append(formatted_article)
+        
+        return jsonify(formatted_news)
+    else:
+        logging.error(f"Failed to fetch news data for ticker {ticker}: {response.text}")
+        return jsonify({'error': 'Failed to fetch news data', 
+                        'status_code': response.status_code, 
                         'message': response.text}), 500
 
 # Run the Flask app
